@@ -5,17 +5,18 @@
     <meta charset="UTF-8" />
     <title>Headless Preview</title>
     <link rel="stylesheet" href="${URLUtils.staticURL('/css/headless-preview.css')}" />
+    <script>
+        window.__headlessPreview = {
+            previewURL: <isprint value="${JSON.stringify(pdict.previewURL)}" encoding="off" />,
+            setContextEndpoint: <isprint value="${JSON.stringify(pdict.setContextEndpoint)}" encoding="off" />,
+            previewContext: <isprint value="${pdict.previewContext}" encoding="off" />,
+            proactiveContextSet: <isprint value="${pdict.proactiveContextSet ? 'true' : 'false'}" encoding="off" />
+        };
+    </script>
+    <!-- must load (blocking) BEFORE the iframe so the message listener exists before the app can post -->
+    <script src="${URLUtils.staticURL('/js/headless-preview.js')}"></script>
 </head>
 <body>
-<script>
-    window.__headlessPreview = {
-        previewURL: <isprint value="${JSON.stringify(pdict.previewURL)}" encoding="off" />,
-        setContextEndpoint: <isprint value="${JSON.stringify(pdict.setContextEndpoint)}" encoding="off" />,
-        previewContext: <isprint value="${pdict.previewContext}" encoding="off" />,
-        proactiveContextSet: <isprint value="${pdict.proactiveContextSet ? 'true' : 'false'}" encoding="off" />
-    };
-</script>
 <iframe id="headlessPreviewFrame" class="headless-preview-frame" src="${pdict.previewURL}" allow="clipboard-write"></iframe>
-<script src="${URLUtils.staticURL('/js/headless-preview.js')}"></script>
 </body>
 </html>

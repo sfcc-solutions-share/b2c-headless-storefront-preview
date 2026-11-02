@@ -96,22 +96,44 @@ function connectToPreviewParent() {
     $('mode').classList.add('preview')
     show('status', 'connecting to ECOM preview…')
 
+    let acked = false
+    const sendToken = async () => {
+        const {access_token} = await getToken()
+        window.parent.postMessage({type: 'headless-preview:token', token: access_token}, parentOrigin)
+    }
+
     window.addEventListener('message', async (event) => {
         if (event.origin !== parentOrigin || event.source !== window.parent) return
         const msg = event.data || {}
 
+        // parent (re)announced itself: it may have missed our first token message
+        if (msg.type === 'headless-preview:parent-ready' && !acked) {
+            sendToken()
+        }
+
         if (msg.type === 'headless-preview:context-set') {
+            // a retried token can be acked more than once; only re-render the first time
+            const first = !acked
+            acked = true
             show('status', msg.ok ? `shopper context set${msg.cached ? ' (proactively, on reload)' : ''}` : `error: ${msg.error}`)
             if (msg.context) show('ecomContext', msg.context)
             // context changed -> refetch everything so SCAPI responses reflect it
-            await renderAll()
+            if (first) await renderAll()
         }
     })
 
-    // hand our shopper token to the ECOM wrapper
-    getToken().then(({access_token}) =>
-        window.parent.postMessage({type: 'headless-preview:token', token: access_token}, parentOrigin)
-    )
+    // hand our shopper token to the ECOM wrapper; retry a few times until acknowledged
+    // (the parent ignores duplicates)
+    sendToken()
+    let attempts = 0
+    const retry = setInterval(() => {
+        if (acked || ++attempts > 5) {
+            clearInterval(retry)
+            if (!acked) show('status', 'no response from ECOM preview wrapper')
+            return
+        }
+        sendToken()
+    }, 1000)
 }
 
 $('refresh').addEventListener('click', renderContext)
