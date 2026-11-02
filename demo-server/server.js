@@ -18,7 +18,8 @@ const {
     SITE_ID = 'RefArchGlobal',
     SLAS_CLIENT_ID,
     SLAS_CLIENT_SECRET,
-    // comma separated list of hostname suffixes allowed to frame this app / receive tokens
+    // comma separated hostnames (or parent domains) allowed to frame this app / receive tokens.
+    // Narrow this to your Business Manager hostname(s) for anything beyond a sandbox demo.
     PREVIEW_PARENT_HOSTS = 'dx.commercecloud.salesforce.com,demandware.net'
 } = process.env
 
@@ -103,7 +104,7 @@ async function serveStatic(res, pathname) {
     }
     try {
         const data = await readFile(file)
-        const frameAncestors = ["'self'", ...parentHosts.map((h) => `https://*.${h}`)].join(' ')
+        const frameAncestors = ["'self'", ...parentHosts.flatMap((h) => [`https://${h}`, `https://*.${h}`])].join(' ')
         res.writeHead(200, {
             'Content-Type': MIME[path.extname(file)] || 'application/octet-stream',
             // allow being framed only by the storefront toolkit (ECOM) hosts

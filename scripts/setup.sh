@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # Install the headless preview cartridge + metadata on an instance using the b2c CLI.
 #
-#   ./scripts/setup.sh <instance-name> [preview-url]
+#   ./scripts/setup.sh <instance-name> [preview-url]   (preview-url defaults to http://localhost:$PORT/)
 #
 # Expects ../.env (see .env.example). Instance name refers to your dw.json / b2c config.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 INSTANCE=${1:?usage: setup.sh <instance> [preview-url]}
-PREVIEW_URL=${2:-}
 set -a; source .env; set +a
+PREVIEW_URL=${2:-http://localhost:${PORT:-3000}/}
 : "${SCAPI_SHORT_CODE:?}" "${SCAPI_ORG_ID:?}" "${SITE_ID:?}" "${PREVIEW_SLAS_CLIENT_ID:?}" "${PREVIEW_SLAS_CLIENT_SECRET:?}"
 
 # instance flags must follow the subcommand
@@ -46,10 +46,8 @@ fi
 b2cx sites cartridges add app_headless_preview --site-id "$SITE_ID" --position first
 
 # 4. preference
-if [ -n "$PREVIEW_URL" ]; then
-  echo "==> Setting headlessPreviewURL=$PREVIEW_URL"
-  b2cx preferences site update HeadlessPreview --site-id "$SITE_ID" "c_headlessPreviewURL=$PREVIEW_URL"
-fi
+echo "==> Setting headlessPreviewURL=$PREVIEW_URL"
+b2cx preferences site update HeadlessPreview --site-id "$SITE_ID" "c_headlessPreviewURL=$PREVIEW_URL"
 
 # 5. optional demo data: "Big Spenders" campaign + 50% off promotion (RefArchGlobal / storefront-catalog-m-non-en)
 if [ "${DEMO_DATA:-0}" = "1" ]; then
