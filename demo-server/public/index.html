@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Headless Preview Demo</title>
+    <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+<header>
+    <strong>Custom Headless Storefront</strong> <span class="muted">(tech demo; not MRT/PWA Kit)</span>
+    <span id="mode" class="badge">standalone</span>
+</header>
+
+<main>
+    <section class="panel">
+        <h2>Shopper</h2>
+        <dl>
+            <dt>USID</dt><dd id="usid">…</dd>
+            <dt>Preview status</dt><dd id="status">not in storefront toolkit</dd>
+        </dl>
+    </section>
+
+    <section class="panel">
+        <h2>ECOM preview context <span class="muted">(sent by parent frame)</span></h2>
+        <pre id="ecomContext">n/a</pre>
+    </section>
+
+    <section class="panel">
+        <h2>SCAPI shopper context <span class="muted">(GET /shopper-context/{usid})</span></h2>
+        <pre id="scapiContext">…</pre>
+        <button id="refresh">Refresh</button>
+    </section>
+
+    <section class="panel wide">
+        <h2>Product search <span class="muted">(prices/promotions reflect shopper context)</span></h2>
+        <form id="searchForm"><input id="q" value="shirt" /> <button>Search</button></form>
+        <div id="results" class="grid"></div>
+    </section>
+</main>
+<script src="/app.js" type="module"></script>
+</body>
+</html>

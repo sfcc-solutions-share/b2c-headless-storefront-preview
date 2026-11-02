@@ -1,0 +1,12 @@
+{
+  "name": "headless-preview-demo-server",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Minimal non-MRT 'custom headless' storefront demonstrating storefront toolkit preview -> SCAPI shopper context",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node --env-file-if-exists=../.env server.js",
+    "tunnel": "cloudflared tunnel --url http://localhost:${PORT:-3000}"
+  }
+}

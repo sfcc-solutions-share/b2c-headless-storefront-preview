@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://www.demandware.com/xml/impex/metadata/2006-10-31">
+    <type-extension type-id="SitePreferences">
+        <custom-attribute-definitions>
+            <attribute-definition attribute-id="headlessPreviewURL">
+                <display-name xml:lang="x-default">Headless Preview URL</display-name>
+                <description xml:lang="x-default">URL of the headless storefront to load in the storefront toolkit (and BM "Storefront" button). Leave empty to disable.</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+            <attribute-definition attribute-id="headlessPreviewRedirect">
+                <display-name xml:lang="x-default">Headless Preview: Redirect Storefront</display-name>
+                <description xml:lang="x-default">When enabled, Default-Start outside of the storefront toolkit redirects to the Headless Preview URL.</description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <default-value>false</default-value>
+            </attribute-definition>
+        </custom-attribute-definitions>
+        <group-definitions>
+            <attribute-group group-id="HeadlessPreview">
+                <display-name xml:lang="x-default">Headless Preview</display-name>
+                <attribute attribute-id="headlessPreviewURL"/>
+                <attribute attribute-id="headlessPreviewRedirect"/>
+            </attribute-group>
+        </group-definitions>
+    </type-extension>
+</metadata>
