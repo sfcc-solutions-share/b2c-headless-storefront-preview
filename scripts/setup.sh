@@ -51,4 +51,11 @@ if [ -n "$PREVIEW_URL" ]; then
   b2cx preferences site update HeadlessPreview --site-id "$SITE_ID" "c_headlessPreviewURL=$PREVIEW_URL"
 fi
 
+# 5. optional demo data: "Big Spenders" campaign + 50% off promotion (RefArchGlobal / storefront-catalog-m-non-en)
+if [ "${DEMO_DATA:-0}" = "1" ]; then
+  echo "==> Importing demo promotion + reindexing $SITE_ID"
+  b2cx job import demo-data --wait --show-log
+  b2cx job run sfcc-search-index-product-full-update --wait --body "{\"site_scope\":[\"$SITE_ID\"]}"
+fi
+
 echo "Done. Remember: Site Preferences > Hybrid Auth Settings > enable Shopper Context for $SITE_ID (if not already)."

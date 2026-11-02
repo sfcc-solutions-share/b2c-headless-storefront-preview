@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<promotions xmlns="http://www.demandware.com/xml/impex/promotion/2008-01-31">
+    <campaign campaign-id="headless-preview-big-spenders">
+        <description>Headless preview demo: only visible to the Big Spenders customer group</description>
+        <enabled-flag>true</enabled-flag>
+        <start-date>2026-01-01T00:00:00.000Z</start-date>
+        <end-date>2030-12-31T23:59:59.000Z</end-date>
+        <customer-groups match-mode="any">
+            <customer-group group-id="Big Spenders"/>
+        </customer-groups>
+    </campaign>
+
+    <promotion promotion-id="headless-preview-big-spenders-50off">
+        <enabled-flag>true</enabled-flag>
+        <archived-flag>false</archived-flag>
+        <searchable-flag>true</searchable-flag>
+        <name xml:lang="x-default">Big Spenders 50% off</name>
+        <callout-msg xml:lang="x-default">Big Spenders: 50% off everything</callout-msg>
+        <product-promotion-rule>
+            <discounted-products>
+                <included-products>
+                    <condition-group>
+                        <category-condition catalog-id="storefront-catalog-m-non-en">
+                            <category-id>root</category-id>
+                        </category-condition>
+                    </condition-group>
+                </included-products>
+            </discounted-products>
+            <simple-discount>
+                <percentage>50.0</percentage>
+            </simple-discount>
+        </product-promotion-rule>
+    </promotion>
+
+    <promotion-campaign-assignment promotion-id="headless-preview-big-spenders-50off" campaign-id="headless-preview-big-spenders">
+        <qualifiers match-mode="any">
+            <customer-groups/>
+        </qualifiers>
+        <rank>100</rank>
+    </promotion-campaign-assignment>
+</promotions>

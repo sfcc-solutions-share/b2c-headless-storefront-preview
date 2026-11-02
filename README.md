@@ -46,6 +46,7 @@ cartridges/app_headless_preview/cartridge/
   scripts/headless-preview/helpers.js   introspect, TSOB, PUT shopper context
   templates/default/headlesspreview/wrapper.isml
   static/default/js/headless-preview.js parent side of the postMessage protocol
+demo-data/                         optional Big Spenders campaign + 50% off promotion (site archive)
 metadata/                          site prefs (HeadlessPreview group) + service definition
 scripts/setup.sh                   import metadata/service, deploy, cartridge path, prefs (b2c CLI)
 demo-server/                       the "custom headless" storefront
@@ -90,6 +91,10 @@ Requirements: [b2c CLI](https://github.com/SalesforceCommerceCloud/b2c-developer
    Re-run with a new URL whenever the quick tunnel URL changes (or just update **Site Preferences → Custom Preferences → Headless Preview**).
 
 5. In BM, enable **Merchant Tools → Site Preferences → Hybrid Auth Settings → Shopper Context** for the site if it isn't already.
+
+### Demo promotion (optional)
+
+`demo-data/` is a site archive with a `headless-preview-big-spenders` campaign (customer group **Big Spenders**) and a searchable promotion, `headless-preview-big-spenders-50off`, giving 50% off everything in `storefront-catalog-m-non-en`. Run `DEMO_DATA=1 ./scripts/setup.sh <instance>` to import it and rebuild the search index. In the toolkit, set **Preview → Customer Groups → Big Spenders**. The product grid then shows a "Big Spenders: 50% off everything" callout, which is missing without that group.
 
 ### Try it
 
