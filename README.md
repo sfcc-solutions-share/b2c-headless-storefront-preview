@@ -17,23 +17,13 @@ This repository contains:
 - `demo-server/`: a dependency-free Node server and page that stand in for "your headless storefront"
 - `demo-data/` (optional): a sample campaign and promotion for trying it out
 
-<figure>
-  <img src="docs/preview-settings.png" alt="Storefront Toolkit preview settings with the Big Spenders customer group selected">
-  <figcaption>
+![Storefront Toolkit preview settings with the Big Spenders customer group selected](docs/preview-settings.png)
 
-**Before preview.** The demo storefront is running inside the Storefront Toolkit. Both context panels show the shopper's default context: <code>Everyone</code> and <code>Unregistered</code>, with today's date. The product grid shows only the regular promotions. In the toolkit's **Site Preview Settings** (right), the merchant picks a future date and adds the **Big Spenders** customer group.
+> **Before preview.** The demo storefront is running inside the Storefront Toolkit. Both context panels show the shopper's default context: `Everyone` and `Unregistered`, with today's date. The product grid shows only the regular promotions. In the toolkit's **Site Preview Settings** (right), the merchant picks a future date and adds the **Big Spenders** customer group.
 
-  </figcaption>
-</figure>
+![After preview: SCAPI shopper context includes Big Spenders and the future date, and product search shows the Big Spenders promotion](docs/preview-big-spenders.png)
 
-<figure>
-  <img src="docs/preview-big-spenders.png" alt="After preview: SCAPI shopper context includes Big Spenders and the future date, and product search shows the Big Spenders promotion">
-  <figcaption>
-
-**After clicking Preview.** The toolkit reloads, and ECOM writes the new preview settings to the shopper's SCAPI Shopper Context. The **SCAPI shopper context** panel (arrows) now matches the ECOM preview context: <code>Big Spenders</code> is in the customer groups and <code>effectiveDateTime</code> is the future date. The storefront's ordinary Shopper Search calls now return the Big Spenders-only promotion ("Big Spenders: 50% off everything"), with no preview-specific code in the storefront's data fetching.
-
-  </figcaption>
-</figure>
+> **After clicking Preview.** The toolkit reloads, and ECOM writes the new preview settings to the shopper's SCAPI Shopper Context. The **SCAPI shopper context** panel (arrows) now matches the ECOM preview context: `Big Spenders` is in the customer groups and `effectiveDateTime` is the future date. The storefront's ordinary Shopper Search calls now return the Big Spenders-only promotion ("Big Spenders: 50% off everything"), with no preview-specific code in the storefront's data fetching.
 
 ## How it works
 
