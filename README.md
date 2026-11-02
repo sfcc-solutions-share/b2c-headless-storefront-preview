@@ -146,3 +146,21 @@ The cartridge only takes over `Default-Start` when `headlessPreviewURL` is set f
 - On non-production instances, a shopper context lasts 1 day, with a quota of 5,000 contexts. TSOB is rate-limited to one call per shopper every 3 seconds (HTTP 409).
 - Only the toolkit's **Preview** settings are supported. Other toolkit features (content, search and page designer tools) aren't.
 - Shopper Context applies to SCAPI calls. Your storefront must refetch data after `context-set` (and must not serve cached responses to the preview shopper) to see the changes.
+
+## License
+
+Licensed under the current NDA and licensing agreement in place with your organization. (This is explicitly **not** open
+source licensing.) See [license.txt](license.txt).
+
+### Support
+
+**This project should not be treated as Salesforce Product.** It is an example implementation of a headless storefront
+preview integration. Customers and partners implement this at-will with no expectation of roadmap, technical support,
+defect resolution, production-style SLAs.
+
+This project is maintained by the **Salesforce Community**. Salesforce Commerce Cloud or Salesforce Platform Technical
+Support do not support this project or its setup.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+
+For feature requests or bugs, please open a [GitHub issue](https://github.com/sfcc-solutions-share/b2c-headless-storefront-preview/issues).
