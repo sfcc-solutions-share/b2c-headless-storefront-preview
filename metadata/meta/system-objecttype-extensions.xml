@@ -17,14 +17,6 @@
                 <externally-managed-flag>false</externally-managed-flag>
                 <default-value>false</default-value>
             </attribute-definition>
-            <attribute-definition attribute-id="headlessPreviewRequireBMSession">
-                <display-name xml:lang="x-default">Headless Preview: Require Business Manager Session</display-name>
-                <description xml:lang="x-default">Only copy preview context to the headless shopper when the request has an authenticated Business Manager session (the storefront toolkit). Recommended. When disabled, anyone who can reach the storefront can use storefront preview URL parameters to set their own shopper context.</description>
-                <type>boolean</type>
-                <mandatory-flag>false</mandatory-flag>
-                <externally-managed-flag>false</externally-managed-flag>
-                <default-value>true</default-value>
-            </attribute-definition>
             <attribute-definition attribute-id="headlessPreviewAllowProduction">
                 <display-name xml:lang="x-default">Headless Preview: Allow on Production</display-name>
                 <description xml:lang="x-default">Allow headless preview on production instances. Disabled by default.</description>
@@ -39,7 +31,6 @@
                 <display-name xml:lang="x-default">Headless Preview</display-name>
                 <attribute attribute-id="headlessPreviewURL"/>
                 <attribute attribute-id="headlessPreviewRedirect"/>
-                <attribute attribute-id="headlessPreviewRequireBMSession"/>
                 <attribute attribute-id="headlessPreviewAllowProduction"/>
             </attribute-group>
         </group-definitions>

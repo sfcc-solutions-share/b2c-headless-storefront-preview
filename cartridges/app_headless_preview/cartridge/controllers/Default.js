@@ -36,7 +36,7 @@ function resolveAction() {
         if (allowed.allowed) {
             return { action: 'preview', previewURL: previewURL };
         }
-        // not allowed (e.g. no BM session): behave like a normal storefront request
+        // not allowed (e.g. production): behave like a normal storefront request
     }
     if (Site.current.getCustomPreferenceValue('headlessPreviewRedirect')) {
         return { action: 'redirect', previewURL: previewURL };

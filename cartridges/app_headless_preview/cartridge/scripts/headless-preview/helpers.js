@@ -156,13 +156,13 @@ function inspectShopperToken(jwt) {
 }
 
 /**
- * Feature toggles (site preferences, group "Headless Preview") deciding whether preview
- * context may be copied for the current request. Used by both Default-Start (wrapper) and
- * HeadlessPreview-SetContext.
+ * Whether preview context may be copied for the current request. Used by both Default-Start
+ * (wrapper) and HeadlessPreview-SetContext.
  *
  *   headlessPreviewAllowProduction (default false): allow on production instances
- *   headlessPreviewRequireBMSession (default true): require a Business Manager user session
- *     (`session.userAuthenticated`, true in the storefront toolkit)
+ *
+ * Restricting preview to Storefront Toolkit users is done by storefront password protection
+ * (see README), which lets toolkit requests through and blocks everyone else.
  *
  * @returns {{allowed: boolean, reason?: string}}
  */
@@ -170,10 +170,6 @@ function checkPreviewAllowed() {
     var prefs = Site.current;
     if (System.instanceType === System.PRODUCTION_SYSTEM && prefs.getCustomPreferenceValue('headlessPreviewAllowProduction') !== true) {
         return { allowed: false, reason: 'Headless preview is disabled on production instances' };
-    }
-    // treat unset (null) as true: secure by default
-    if (prefs.getCustomPreferenceValue('headlessPreviewRequireBMSession') !== false && !session.userAuthenticated) {
-        return { allowed: false, reason: 'A Business Manager session is required' };
     }
     return { allowed: true };
 }

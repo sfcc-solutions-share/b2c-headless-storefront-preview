@@ -8,7 +8,7 @@
  *
  * The context written is computed here on the server from the current session; the
  * browser only supplies a shopper token. Access is gated by checkPreviewAllowed()
- * (BM session required / disabled on production by default) and a same-origin check.
+ * (disabled on production by default) and a same-origin check.
  *
  * POST application/x-www-form-urlencoded: jwt=<SLAS shopper access token>
  *

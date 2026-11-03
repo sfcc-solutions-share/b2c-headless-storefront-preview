@@ -73,14 +73,14 @@ These are the high-level steps. [Setup with the b2c CLI](#setup-with-the-b2c-cli
    - **ECOM preview client**, used only by the cartridge's service. Scopes: `sfcc.ts_ext_on_behalf_of` and `sfcc.shopper-context.rw`. Don't use this client anywhere else.
    - **Storefront client**, for your headless storefront (or the demo server). Default shopper scopes; the demo also adds `sfcc.shopper-context`.
 2. **Import the metadata** in `metadata/` (**Administration → Site Development → Site Import & Export**, or as part of your site archive):
-   - `meta/system-objecttype-extensions.xml`: site preferences `headlessPreviewURL`, `headlessPreviewRedirect` and the [feature toggles](#feature-toggles) (group **Headless Preview**)
+   - `meta/system-objecttype-extensions.xml`: site preferences `headlessPreviewURL`, `headlessPreviewRedirect` and `headlessPreviewAllowProduction` (group **Headless Preview**)
    - `services.xml`: the `headless.preview.scapi` service, profile and credential
 3. **Configure the service credential** (**Administration → Operations → Services → Credentials → `headless.preview.scapi`**):
    - URL: `https://{shortCode}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{organizationId}/`
    - User / Password: the ECOM preview client ID and secret
 4. **Upload the `app_headless_preview` cartridge** to your code version, and add it to the **front** of the site's cartridge path.
 5. **Enable Shopper Context** for the site: **Merchant Tools → Site Preferences → Hybrid Auth Settings**.
-   Review the [feature toggles](#feature-toggles). By default, preview requires a Business Manager session and is disabled on production instances.
+   Enable [storefront password protection](#storefront-password-protection-recommended) on the instance. Preview is disabled on production instances by default.
 6. **Set the preview URL**: **Merchant Tools → Site Preferences → Custom Preferences → Headless Preview → Headless Preview URL**, pointing to your storefront (for the demo, `http://localhost:3000/`). Optionally enable **Redirect Storefront** to send non-toolkit `Default-Start` requests to the same URL.
 7. **Run the demo storefront** (optional):
 
@@ -127,16 +127,17 @@ DEMO_DATA=1 ./scripts/setup.sh <instance> [preview-url]
 
 ## Security considerations
 
-### Feature toggles
+### Storefront password protection (recommended)
 
-These site preferences are in the **Headless Preview** group:
+Without it, anyone who can reach the instance can add the platform's preview URL parameters (for example `__customerGroup`) to a storefront request and copy any customer group or future date onto **their own** shopper. That exposes group-only or unreleased promotions and pricing, including in their basket. On non-production instances, the platform honors these parameters for any request, not just Storefront Toolkit ones.
 
-| Preference | Default | Effect |
-| --- | --- | --- |
-| `headlessPreviewRequireBMSession` | `true` | Only copy preview context when the request has an authenticated Business Manager session (`session.userAuthenticated`), which is the case in the Storefront Toolkit. Without this, anyone who can reach the storefront can add the platform's preview URL parameters (for example `__customerGroup`) and copy any customer group or future date onto **their own** shopper. That exposes group-only or unreleased promotions and pricing, including in their basket. |
-| `headlessPreviewAllowProduction` | `false` | Production instances are blocked unless this is enabled. |
+Enable **storefront password protection** on every non-production instance where you use preview (**Merchant Tools → Site Preferences → Storefront Access**). The platform then answers storefront requests, including `Default-Start` and `HeadlessPreview-SetContext`, with `401` unless they come from the Storefront Toolkit of a logged-in Business Manager user. Optionally, you can require that user to have the storefront functional permission. The toolkit keeps working as before.
 
-When a check fails, `HeadlessPreview-SetContext` returns `403`, and `Default-Start` behaves as if preview weren't active.
+Protect your headless storefront's own non-production deployments too, for example with basic auth or an IP allowlist, since it runs on a separate host.
+
+### Production
+
+Preview is blocked on production instances unless the site preference `headlessPreviewAllowProduction` (group **Headless Preview**) is enabled. When this check fails, `HeadlessPreview-SetContext` returns `403`, and `Default-Start` behaves as if preview weren't active.
 
 ### Built-in checks
 
