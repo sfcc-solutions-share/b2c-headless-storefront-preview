@@ -16,6 +16,7 @@
 var LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
 var StringUtils = require('dw/util/StringUtils');
 var Site = require('dw/system/Site');
+var System = require('dw/system/System');
 var Logger = require('dw/system/Logger').getLogger('headless-preview', 'headless-preview');
 
 var SERVICE_ID = 'headless.preview.scapi';
@@ -139,14 +140,42 @@ function inspectShopperToken(jwt) {
         if (!usidPart) {
             return { valid: false, error: 'No USID in token' };
         }
-        if (claims.isb && claims.isb.indexOf('chid:' + Site.current.ID) === -1) {
+        // require the channel claim (don't skip the check if it's missing)
+        if (!claims.isb || claims.isb.split('::').indexOf('chid:' + Site.current.ID) === -1) {
             return { valid: false, error: 'Token was not issued for site ' + Site.current.ID };
+        }
+        // TSOB is requested with login_id=guest; don't touch registered shoppers' contexts
+        if (!isGuest) {
+            return { valid: false, error: 'Only guest shopper tokens are supported' };
         }
 
         return { valid: true, usid: usidPart.replace('usid:', ''), isGuest: isGuest };
     } catch (e) {
         return { valid: false, error: 'Unable to parse token' };
     }
+}
+
+/**
+ * Feature toggles (site preferences, group "Headless Preview") deciding whether preview
+ * context may be copied for the current request. Used by both Default-Start (wrapper) and
+ * HeadlessPreview-SetContext.
+ *
+ *   headlessPreviewAllowProduction (default false): allow on production instances
+ *   headlessPreviewRequireBMSession (default true): require a Business Manager user session
+ *     (`session.userAuthenticated`, true in the storefront toolkit)
+ *
+ * @returns {{allowed: boolean, reason?: string}}
+ */
+function checkPreviewAllowed() {
+    var prefs = Site.current;
+    if (System.instanceType === System.PRODUCTION_SYSTEM && prefs.getCustomPreferenceValue('headlessPreviewAllowProduction') !== true) {
+        return { allowed: false, reason: 'Headless preview is disabled on production instances' };
+    }
+    // treat unset (null) as true: secure by default
+    if (prefs.getCustomPreferenceValue('headlessPreviewRequireBMSession') !== false && !session.userAuthenticated) {
+        return { allowed: false, reason: 'A Business Manager session is required' };
+    }
+    return { allowed: true };
 }
 
 /**
@@ -218,6 +247,7 @@ function copyRequestContextToShopperContext(usid) {
 }
 
 module.exports = {
+    checkPreviewAllowed: checkPreviewAllowed,
     inspectShopperToken: inspectShopperToken,
     getCurrentRequestContext: getCurrentRequestContext,
     copyRequestContextToShopperContext: copyRequestContextToShopperContext

@@ -32,7 +32,11 @@ function resolveAction() {
     var inToolkit = request.httpParameterMap.__sftkCacheBuster.submitted;
 
     if (inToolkit) {
-        return { action: 'preview', previewURL: previewURL };
+        var allowed = require('*/cartridge/scripts/headless-preview/helpers').checkPreviewAllowed();
+        if (allowed.allowed) {
+            return { action: 'preview', previewURL: previewURL };
+        }
+        // not allowed (e.g. no BM session): behave like a normal storefront request
     }
     if (Site.current.getCustomPreferenceValue('headlessPreviewRedirect')) {
         return { action: 'redirect', previewURL: previewURL };

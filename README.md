@@ -73,13 +73,14 @@ These are the high-level steps. [Setup with the b2c CLI](#setup-with-the-b2c-cli
    - **ECOM preview client**, used only by the cartridge's service. Scopes: `sfcc.ts_ext_on_behalf_of` and `sfcc.shopper-context.rw`. Don't use this client anywhere else.
    - **Storefront client**, for your headless storefront (or the demo server). Default shopper scopes; the demo also adds `sfcc.shopper-context`.
 2. **Import the metadata** in `metadata/` (**Administration → Site Development → Site Import & Export**, or as part of your site archive):
-   - `meta/system-objecttype-extensions.xml`: site preferences `headlessPreviewURL` and `headlessPreviewRedirect` (group **Headless Preview**)
+   - `meta/system-objecttype-extensions.xml`: site preferences `headlessPreviewURL`, `headlessPreviewRedirect` and the [feature toggles](#feature-toggles) (group **Headless Preview**)
    - `services.xml`: the `headless.preview.scapi` service, profile and credential
 3. **Configure the service credential** (**Administration → Operations → Services → Credentials → `headless.preview.scapi`**):
    - URL: `https://{shortCode}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{organizationId}/`
    - User / Password: the ECOM preview client ID and secret
 4. **Upload the `app_headless_preview` cartridge** to your code version, and add it to the **front** of the site's cartridge path.
 5. **Enable Shopper Context** for the site: **Merchant Tools → Site Preferences → Hybrid Auth Settings**.
+   Review the [feature toggles](#feature-toggles). By default, preview requires a Business Manager session and is disabled on production instances.
 6. **Set the preview URL**: **Merchant Tools → Site Preferences → Custom Preferences → Headless Preview → Headless Preview URL**, pointing to your storefront (for the demo, `http://localhost:3000/`). Optionally enable **Redirect Storefront** to send non-toolkit `Default-Start` requests to the same URL.
 7. **Run the demo storefront** (optional):
 
@@ -126,12 +127,28 @@ DEMO_DATA=1 ./scripts/setup.sh <instance> [preview-url]
 
 ## Security considerations
 
-- **Restrict who can frame your storefront.** Send `Content-Security-Policy: frame-ancestors` with only your Business Manager hostnames, for example `frame-ancestors 'self' https://production-mycompany.demandware.net https://staging-mycompany.demandware.net`. Include any custom Business Manager hostnames you use. Use the same list as the allowlist your storefront checks before posting its token. The demo defaults to every sandbox and PIG domain (`*.dx.commercecloud.salesforce.com`, `*.demandware.net`) for convenience. Narrow it with `PREVIEW_PARENT_HOSTS` (exact hostnames or parent domains) for anything beyond a sandbox.
+### Feature toggles
+
+These site preferences are in the **Headless Preview** group:
+
+| Preference | Default | Effect |
+| --- | --- | --- |
+| `headlessPreviewRequireBMSession` | `true` | Only copy preview context when the request has an authenticated Business Manager session (`session.userAuthenticated`), which is the case in the Storefront Toolkit. Without this, anyone who can reach the storefront can add the platform's preview URL parameters (for example `__customerGroup`) and copy any customer group or future date onto **their own** shopper. That exposes group-only or unreleased promotions and pricing, including in their basket. |
+| `headlessPreviewAllowProduction` | `false` | Production instances are blocked unless this is enabled. |
+
+When a check fails, `HeadlessPreview-SetContext` returns `403`, and `Default-Start` behaves as if preview weren't active.
+
+### Built-in checks
+
+- **The browser can't choose the values or the shopper.** `HeadlessPreview-SetContext` only accepts a shopper access token. ECOM validates it with SLAS introspection, and requires it to be an active **guest** token whose channel claim matches the current site. The USID comes from that validated token, and the context values come from the ECOM session.
+- **Same-origin only.** `HeadlessPreview-SetContext` rejects cross-origin `POST` requests (its `Origin` must be the instance host). This stops another site from making a merchant's browser copy their preview settings onto an attacker's shopper.
+- **The TSOB client stays server-side and minimal.** The ECOM preview client has powerful scopes (`sfcc.ts_ext_on_behalf_of` acts on behalf of shoppers). Store its secret only in the service credential, give it only the two scopes above, don't reuse it in the storefront, and rotate it like any other secret. The service has communication logging disabled, and its log filter masks tokens.
+
+### Your storefront
+
+- **Restrict who can frame it.** Send `Content-Security-Policy: frame-ancestors` with only your Business Manager hostnames, for example `frame-ancestors 'self' https://staging-mycompany.demandware.net`. Include any custom Business Manager hostnames. Use the same list as the allowlist your storefront checks before posting its token. The demo defaults to every sandbox and PIG domain (`*.dx.commercecloud.salesforce.com`, `*.demandware.net`) for convenience. Narrow it with `PREVIEW_PARENT_HOSTS` (exact hostnames or parent domains).
 - **Only post the token to an exact, allowlisted origin.** Never use `'*'` as the `postMessage` target origin. Ignore incoming messages whose `origin` or `source` isn't the expected parent. The cartridge's wrapper does the same in the other direction: it only accepts messages from the configured preview URL's origin.
-- **The context comes from ECOM, not the browser.** `HeadlessPreview-SetContext` takes only a shopper token, and it validates that token with SLAS (active, issued for this site's channel). Preview values come from the ECOM session, and only a Storefront Toolkit session (an authenticated Business Manager user) carries preview settings. Any other caller can only copy its own normal session context onto its own shopper.
-- **Keep the TSOB client server-side and minimal.** The ECOM preview client has powerful scopes (`sfcc.ts_ext_on_behalf_of` lets it act on behalf of shoppers). Store its secret only in the service credential, give it only the two scopes above, and don't reuse it in the storefront. Rotate it like any other secret.
-- **Don't log tokens.** The service has communication logging disabled, and its log filter masks tokens. Keep it that way in production.
-- **Production instances:** shopper context changes affect real shopper sessions. Preview usually happens on staging or development instances, but if you enable this on production, scope the preview URL and `frame-ancestors` carefully.
+- **Don't cache preview responses.** Responses for a shopper with a preview context must not be served from a shared cache to other shoppers.
 
 ## Coexisting with other cartridges
 
